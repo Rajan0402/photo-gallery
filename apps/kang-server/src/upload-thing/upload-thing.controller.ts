@@ -1,26 +1,35 @@
-import {
-  Controller,
-  Post,
-  UseInterceptors,
-  UploadedFiles,
-} from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { UploadThingService } from './upload-thing.service';
+//***************************************************************************************************************** */
+//******** Removing this file to make this module not available via API and making it only for internal use ********//
+//***************************************************************************************************************** */
 
-@Controller('upload')
-export class UploadThingController {
-  constructor(private readonly uploadService: UploadThingService) {}
+// import {
+//   Controller,
+//   Post,
+//   UseInterceptors,
+//   UploadedFiles,
+//   Delete,
+// } from '@nestjs/common';
+// import { FilesInterceptor } from '@nestjs/platform-express';
+// import { UploadThingService } from './upload-thing.service';
 
-  @Post()
-  @UseInterceptors(FilesInterceptor('files'))
-  async uploadFile(@UploadedFiles() files: Express.Multer.File[]) {
-    console.log('Received files:', files); // Inspect the files
-    return this.uploadService.utUploadFile(files);
-  }
+// @Controller('ut')
+// export class UploadThingController {
+//   constructor(private readonly uploadThingService: UploadThingService) {}
 
-  @Post('url')
-  async uploadFilesFromURL(files: string[]) {
-    files = ['https://photos.app.goo.gl/wNYnzeKCDSe4AMoV6'];
-    return this.uploadService.utUploadFilesFromURL(files);
-  }
-}
+//   @Post('uploadFiles')
+//   @UseInterceptors(FilesInterceptor('files'))
+//   async uploadFile(@UploadedFiles() files: Express.Multer.File[]) {
+//     console.log('Received files:', files); // Inspect the files
+//     return this.uploadThingService.utUploadFile(files);
+//   }
+
+//   @Post('uploadFilesFromURL')
+//   async uploadFilesFromURL(files: string[]) {
+//     return this.uploadThingService.utUploadFilesFromURL(files);
+//   }
+
+//   @Delete('deleteFiles')
+//   async deleteFiles(files: string[]) {
+//     return this.uploadThingService.utDeleteFiles(files);
+//   }
+// }

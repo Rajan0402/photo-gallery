@@ -6,7 +6,7 @@ interface FileEsque extends Blob {
   name: string;
   customId?: string;
 }
-interface deleteFileRespose {
+export interface deleteFileRespose {
   success: boolean;
   deletedCount: number;
 }

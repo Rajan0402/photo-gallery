@@ -1,13 +1,13 @@
 import 'dotenv/config';
 import { Module } from '@nestjs/common';
-import { UploadThingController } from './upload-thing.controller';
+// import { UploadThingController } from './upload-thing.controller';
 import { UploadThingService } from './upload-thing.service';
 import { UTApi } from 'uploadthing/server';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [ConfigModule],
-  controllers: [UploadThingController],
+  // controllers: [UploadThingController], //controller removed
   providers: [
     UploadThingService,
     {
@@ -22,5 +22,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       },
     },
   ],
+  exports: [UploadThingService],
 })
 export class UploadThingModule {}
