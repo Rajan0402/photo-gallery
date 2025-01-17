@@ -1,15 +1,15 @@
 import 'dotenv/config';
 import { Module } from '@nestjs/common';
-import { UploadController } from './upload.controller';
-import { UploadService } from './upload.service';
+import { UploadThingController } from './upload-thing.controller';
+import { UploadThingService } from './upload-thing.service';
 import { UTApi } from 'uploadthing/server';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [ConfigModule],
-  controllers: [UploadController],
+  controllers: [UploadThingController],
   providers: [
-    UploadService,
+    UploadThingService,
     {
       provide: UTApi,
       inject: [ConfigService],
@@ -23,4 +23,4 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     },
   ],
 })
-export class UploadModule {}
+export class UploadThingModule {}

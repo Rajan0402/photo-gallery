@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UTApi, UTFile } from 'uploadthing/server';
+import { UTApi } from 'uploadthing/server';
 import { UploadFileResult } from 'uploadthing/types';
 
 interface FileEsque extends Blob {
@@ -12,28 +12,30 @@ interface deleteFileRespose {
 }
 
 @Injectable()
-export class UploadService {
+export class UploadThingService {
   constructor(private readonly utapi: UTApi) {}
 
-  async uploadFile(files: Express.Multer.File[]): Promise<UploadFileResult[]> {
+  async utUploadFile(
+    files: Express.Multer.File[],
+  ): Promise<UploadFileResult[]> {
     const transformedFiles: FileEsque[] = files.map((file) => {
       const blob = new Blob([file.buffer], { type: file.mimetype }); // Create a Blob from the file buffer
       return Object.assign(blob, {
         name: file.originalname,
       });
     });
-    console.log('transformedFiles:', transformedFiles);
+    // console.log('transformedFiles:', transformedFiles);
     const response = await this.utapi.uploadFiles(transformedFiles);
-    console.log('files uploaded:', response);
+    // console.log('files uploaded:', response);
     return response;
   }
 
-  async uploadFilesFromURL(files: string[]): Promise<UploadFileResult[]> {
+  async utUploadFilesFromURL(files: string[]): Promise<UploadFileResult[]> {
     const response = await this.utapi.uploadFilesFromUrl(files);
     return response;
   }
 
-  async deleteFiles(files: string[]): Promise<deleteFileRespose> {
+  async utDeleteFiles(files: string[]): Promise<deleteFileRespose> {
     const response = await this.utapi.deleteFiles(files);
     return response;
   }

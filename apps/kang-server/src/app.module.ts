@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
 import { DrizzleModule } from './drizzle/drizzle.module';
-import { UploadModule } from './upload/upload.module';
+import { UploadThingModule } from './upload/upload-thing.module';
+import { UploadFilesModule } from './upload-files/upload-files.module';
 
 @Module({
-  imports: [DrizzleModule, UploadModule],
+  imports: [DrizzleModule, UploadThingModule, UploadFilesModule],
   controllers: [AppController],
   providers: [AppService],
 })
