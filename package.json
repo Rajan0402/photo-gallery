@@ -6,9 +6,13 @@
   ],
   "scripts": {
     "dev": "turbo run dev",
-    "build": "turbo run build"
+    "build": "turbo run build",
+    "db-generate": "cd ./apps/kang-server && npx drizzle-kit generate",
+    "db-migrate": "cd ./apps/kang-server && npx drizzle-kit migrate"
   },
   "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/multer": "^1.4.12",
     "turbo": "^2.3.3"
   }
 }
