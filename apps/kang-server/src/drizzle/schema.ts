@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import {
   index,
   pgTableCreator,
@@ -12,6 +12,7 @@ export const createTable = pgTableCreator((name) => `photo_gallery_${name}`);
 export const users = createTable('user', {
   id: varchar('id').primaryKey().unique(),
   email: varchar('email').unique().notNull(),
+  username: varchar('username').unique().notNull(),
   password: varchar('password').notNull(),
 });
 
@@ -27,3 +28,7 @@ export const photos = createTable('photo', {
     .notNull(),
   updatedAt: timestamp('updatedAt'),
 });
+
+export const photoRelations = relations(photos, ({ one }) => ({
+  user: one(users),
+}));
