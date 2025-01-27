@@ -18,6 +18,7 @@ export class UploadThingService {
   async utUploadFile(
     files: Express.Multer.File[],
   ): Promise<UploadFileResult[]> {
+    console.log('files:--', files);
     const transformedFiles: FileEsque[] = files.map((file) => {
       const blob = new Blob([file.buffer], { type: file.mimetype }); // Create a Blob from the file buffer
       return Object.assign(blob, {
@@ -26,7 +27,13 @@ export class UploadThingService {
     });
     // console.log('transformedFiles:', transformedFiles);
     const response = await this.utapi.uploadFiles(transformedFiles);
-    // console.log('files uploaded:', response);
+
+    // to log in console, the files uploaded
+    let resArr = [];
+    for (const perFileResponse of response) {
+      resArr.push(perFileResponse.data.name);
+    }
+    console.log('files uploaded:', resArr);
     return response;
   }
 
