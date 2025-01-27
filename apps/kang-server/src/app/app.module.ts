@@ -4,9 +4,19 @@ import { AppService } from './app.service';
 import { DrizzleModule } from '../drizzle/drizzle.module';
 import { UploadThingModule } from '../upload-thing/upload-thing.module';
 import { UploadFilesModule } from '../upload-files/upload-files.module';
+import { UsersModule } from 'src/users/users.module';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [DrizzleModule, UploadThingModule, UploadFilesModule],
+  imports: [
+    AuthModule,
+    DrizzleModule,
+    UploadThingModule,
+    UploadFilesModule,
+    UsersModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
