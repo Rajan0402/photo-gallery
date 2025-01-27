@@ -1,6 +1,7 @@
 import { relations, sql } from 'drizzle-orm';
 import {
   index,
+  integer,
   pgTableCreator,
   serial,
   timestamp,
@@ -9,18 +10,23 @@ import {
 
 export const createTable = pgTableCreator((name) => `photo_gallery_${name}`);
 
-export const users = createTable('user', {
-  id: varchar('id').primaryKey().unique(),
+export const users = createTable('users', {
+  id: integer('id').primaryKey().unique().notNull(),
   email: varchar('email').unique().notNull(),
   username: varchar('username').unique().notNull(),
   password: varchar('password').notNull(),
+  hashedRefreshToken: varchar('hashedRefreshToken'),
 });
 
-export const photos = createTable('photo', {
-  id: serial('id').primaryKey(),
+export const usersRelations = relations(users, ({ many }) => ({
+  photos: many(photos),
+}));
+
+export const photos = createTable('photos', {
+  id: integer('id').primaryKey().unique().notNull(),
   name: varchar('name', { length: 256 }).notNull(),
   url: varchar('url', { length: 1024 }).notNull(),
-  userId: varchar('userId', { length: 256 })
+  userId: integer('userId')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at')
@@ -29,6 +35,6 @@ export const photos = createTable('photo', {
   updatedAt: timestamp('updatedAt'),
 });
 
-export const photoRelations = relations(photos, ({ one }) => ({
+export const photosRelations = relations(photos, ({ one }) => ({
   user: one(users),
 }));

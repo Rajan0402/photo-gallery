@@ -1,16 +1,16 @@
 {
-  "id": "79512cdc-4e0d-4406-abc8-8c1e8bb21f2c",
+  "id": "87dbc4bd-e7e4-4f30-adcd-f29a9ec79f95",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.photo_gallery_photo": {
-      "name": "photo_gallery_photo",
+    "public.photo_gallery_photos": {
+      "name": "photo_gallery_photos",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true
         },
@@ -28,7 +28,7 @@
         },
         "userId": {
           "name": "userId",
-          "type": "varchar(256)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -48,10 +48,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "photo_gallery_photo_userId_photo_gallery_user_id_fk": {
-          "name": "photo_gallery_photo_userId_photo_gallery_user_id_fk",
-          "tableFrom": "photo_gallery_photo",
-          "tableTo": "photo_gallery_user",
+        "photo_gallery_photos_userId_photo_gallery_users_id_fk": {
+          "name": "photo_gallery_photos_userId_photo_gallery_users_id_fk",
+          "tableFrom": "photo_gallery_photos",
+          "tableTo": "photo_gallery_users",
           "columnsFrom": [
             "userId"
           ],
@@ -63,18 +63,26 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "photo_gallery_photos_id_unique": {
+          "name": "photo_gallery_photos_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.photo_gallery_user": {
-      "name": "photo_gallery_user",
+    "public.photo_gallery_users": {
+      "name": "photo_gallery_users",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true
         },
@@ -84,29 +92,48 @@
           "primaryKey": false,
           "notNull": true
         },
+        "username": {
+          "name": "username",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
         "password": {
           "name": "password",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
+        },
+        "hashedRefreshToken": {
+          "name": "hashedRefreshToken",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "photo_gallery_user_id_unique": {
-          "name": "photo_gallery_user_id_unique",
+        "photo_gallery_users_id_unique": {
+          "name": "photo_gallery_users_id_unique",
           "nullsNotDistinct": false,
           "columns": [
             "id"
           ]
         },
-        "photo_gallery_user_email_unique": {
-          "name": "photo_gallery_user_email_unique",
+        "photo_gallery_users_email_unique": {
+          "name": "photo_gallery_users_email_unique",
           "nullsNotDistinct": false,
           "columns": [
             "email"
+          ]
+        },
+        "photo_gallery_users_username_unique": {
+          "name": "photo_gallery_users_username_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "username"
           ]
         }
       },
