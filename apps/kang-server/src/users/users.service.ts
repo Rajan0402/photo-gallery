@@ -11,10 +11,18 @@ export class UsersService {
   constructor(@Inject(DRIZZLE) private db: DrizzleDB) {}
 
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    return this.db
+      .insert(users)
+      .values({
+        email: createUserDto.email,
+        password: createUserDto.password,
+        username: createUserDto.username,
+        hashedRefreshToken: createUserDto?.hashedRefreshToken,
+      })
+      .returning();
   }
 
-  async findAll() {
+  findAll() {
     // return await this.db.select().from(users);
     return this.db.query.users.findMany();
   }
@@ -22,18 +30,25 @@ export class UsersService {
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
-  async findOneByEmail(email: string) {
+
+  findOneByEmail(email: string) {
     return this.db.query.users.findFirst({ where: eq(users.email, email) });
+  }
+
+  findOneByUsername(username: string) {
+    return this.db.query.users.findFirst({
+      where: eq(users.username, username),
+    });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
 
-  async updateRTHash(userId, hashedRefreshToken) {
-    await this.db
+  updateRTHash(userId: number, hashedRefreshToken: string) {
+    return this.db
       .update(users)
-      .set({ hashedRefreshToken } as Partial<typeof users>)
+      .set({ hashedRefreshToken: hashedRefreshToken })
       .where(eq(users.id, userId));
   }
 
