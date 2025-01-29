@@ -19,7 +19,7 @@ export const users = createTable('users', {
   email: varchar('email').unique().notNull(),
   username: varchar('username', { length: 14 }).unique().notNull(),
   password: varchar('password').notNull(),
-  hashedRefreshToken: varchar('hashedRefreshToken', { length: 255 }),
+  hashedRefreshToken: varchar('hashedRefreshToken', { length: 255 }).notNull(),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
