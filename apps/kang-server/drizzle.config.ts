@@ -8,5 +8,6 @@ export default {
   dbCredentials: {
     url: process.env.DATABASE_URL,
   },
+  out: './drizzle',
   tablesFilter: ['photo_gallery_*'],
 } satisfies Config;

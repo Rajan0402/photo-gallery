@@ -1,0 +1,2 @@
+ALTER TABLE "photo_gallery_users" ALTER COLUMN "username" SET DATA TYPE varchar(14);--> statement-breakpoint
+ALTER TABLE "photo_gallery_users" ALTER COLUMN "hashedRefreshToken" SET DATA TYPE varchar(255);
