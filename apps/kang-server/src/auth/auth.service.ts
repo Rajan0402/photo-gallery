@@ -1,15 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { HTTP_ONLY_COOKIE, saltOrRounds } from './auth.constants';
 import { CreateUserDto } from '@/users/dto/create-user.dto';
+import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { DrizzleDB } from '@/drizzle/types/drizzle';
+import { eq } from 'drizzle-orm';
+import { users } from '@/drizzle/schema';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    @Inject(DRIZZLE) private db: DrizzleDB,
   ) {}
 
   async getJWT(payload, expiresIn = null, secret = null) {
@@ -27,8 +37,27 @@ export class AuthService {
     await this.usersService.updateRTHash(userId, hashedRefreshToken);
   }
 
-  async refreshToken(user: any) {
-    throw new Error('refreshToken Method not implemented.');
+  async refreshToken(user: any, refreshToken: string) {
+    const userExist = await this.db.query.users.findFirst({
+      where: eq(users.id, user.id),
+    });
+
+    if (!userExist || !userExist.hashedRefreshToken)
+      throw new UnauthorizedException();
+
+    const isRTvalid = await bcrypt.compare(
+      refreshToken,
+      userExist.hashedRefreshToken,
+    );
+
+    if (!isRTvalid) throw new ForbiddenException('Access Denied');
+
+    const token = await this.getJWT({
+      email: userExist.email,
+      sub: userExist.id,
+    });
+
+    return { accessToken: token };
   }
 
   async validateUser(email: string, password: string) {
@@ -105,6 +134,7 @@ export class AuthService {
   async signInUser(user: any) {
     // TODO: replace email with username
     const payload = { email: user.email, sub: user.id };
+    const accessToken = await this.getJWT(payload);
     const refreshToken = await this.getJWT(
       payload,
       process.env.JWT_REFRESH_TOKEN_EXPIRES_DAYS,
@@ -112,7 +142,7 @@ export class AuthService {
     );
     await this.updateRTHash(user.id, refreshToken);
     return {
-      access_token: 'access_token',
+      accessToken: accessToken,
     };
   }
 
