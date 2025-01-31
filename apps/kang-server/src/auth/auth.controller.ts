@@ -18,6 +18,7 @@ export class AuthController {
 
   @Post('signUpUser')
   async signUpUser(@Request() req) {
+    console.log('Welcome!!');
     return this.authService.signUpUser(req.user);
   }
 
@@ -31,7 +32,12 @@ export class AuthController {
   @UseGuards(RefreshJwtAuthGuard)
   @Post('session')
   async session(@Request() req) {
-    // console.log('request==', req.user);
-    return this.authService.refreshToken(req.user);
+    let refreshToken = req?.signedCookies?.refreshToken;
+
+    // in case testing api through postman, **add headers.origin as mentioned below in postman
+    if (!refreshToken && req?.headers?.origin === 'http://fromPostman.com') {
+      refreshToken = req?.headers?.authorization.split(' ')[1];
+    }
+    return this.authService.refreshToken(req.user, refreshToken);
   }
 }

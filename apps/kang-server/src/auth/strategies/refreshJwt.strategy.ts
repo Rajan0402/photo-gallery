@@ -22,7 +22,6 @@ export class RefreshJwtStrategy extends PassportStrategy(
 }
 
 function cookieExtractor(request): string | null {
-  console.log('request in refresh strategy-----', request);
   let refreshToken = request?.signedCookies?.refreshToken;
 
   // in case testing api through postman, **add headers.origin as mentioned below in postman
@@ -30,5 +29,6 @@ function cookieExtractor(request): string | null {
     refreshToken = request?.headers?.authorization.split(' ')[1];
     return refreshToken;
   }
-  return null;
+  console.log('refreshToken--', refreshToken);
+  return refreshToken || null;
 }

@@ -9,7 +9,10 @@ async function bootstrap() {
 
   app.use(cookieParser(process.env.COOKIE_SECRET));
 
-  app.enableCors();
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
 
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
