@@ -1,5 +1,5 @@
 {
-  "id": "87dbc4bd-e7e4-4f30-adcd-f29a9ec79f95",
+  "id": "bff44daf-3ac6-4902-bef9-6f9b4f1e8b3a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -10,7 +10,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
@@ -63,15 +63,7 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "photo_gallery_photos_id_unique": {
-          "name": "photo_gallery_photos_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -82,7 +74,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
@@ -94,7 +86,7 @@
         },
         "username": {
           "name": "username",
-          "type": "varchar",
+          "type": "varchar(14)",
           "primaryKey": false,
           "notNull": true
         },
@@ -106,22 +98,15 @@
         },
         "hashedRefreshToken": {
           "name": "hashedRefreshToken",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "photo_gallery_users_id_unique": {
-          "name": "photo_gallery_users_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
-        },
         "photo_gallery_users_email_unique": {
           "name": "photo_gallery_users_email_unique",
           "nullsNotDistinct": false,

@@ -1,0 +1,1 @@
+ALTER TABLE "photo_gallery_users" ALTER COLUMN "hashedRefreshToken" SET DEFAULT null;

@@ -29,8 +29,18 @@ export class LocalAuthGuard extends AuthGuard('local') {
   ) {
     if (err || !user || info) throw err || new UnauthorizedException();
 
-    const accessToken = this.jwtService.sign({ sub: user.id });
-    const refreshToken = this.jwtService.sign({ sub: user.id });
+    const accessToken = this.jwtService.sign({
+      sub: user.id,
+      email: user.email,
+    });
+    const refreshToken = this.jwtService.sign(
+      { sub: user.id },
+      {
+        secret: process.env.JWT_REFRESH_TOKEN_SECRET,
+        expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_DAYS,
+      },
+    );
+    console.log('RT set in cookie thru guard ----', refreshToken);
 
     const request = this.getRequest(context);
     request.res?.cookie('accessToken', accessToken, HTTP_ONLY_COOKIE);

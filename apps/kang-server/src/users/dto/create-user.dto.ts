@@ -1,6 +1,6 @@
 export type CreateUserDto = {
   email: string;
-  username?: string;
+  username: string;
   password: string;
   hashedRefreshToken?: string;
 };

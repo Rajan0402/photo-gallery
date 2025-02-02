@@ -12,16 +12,18 @@ const db = drizzle(pool, { schema }) as NodePgDatabase<typeof schema>;
 async function seed() {
   await db.insert(schema.users).values([
     {
-      id: 1,
-      email: 'rajan.yadav@gamil.com',
+      // id: 1,
+      email: 'rajan.yadav@gmail.com',
       username: 'rajan',
       password: 'password',
+      // hashedRefreshToken: 'wccabvrvevvv',
     },
     {
-      id: 2,
-      email: 'atul.yadav@gamil.com',
+      // id: 2,
+      email: 'atul.yadav@gmail.com',
       username: 'atul',
       password: 'password',
+      // hashedRefreshToken: 'wccabvrvevvv',
     },
   ]);
 }

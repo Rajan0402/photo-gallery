@@ -7,7 +7,7 @@ import {
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { HTTP_ONLY_COOKIE, saltOrRounds } from './auth.constants';
+import { HTTP_ONLY_REFRESH_TOKEN_COOKIE, saltOrRounds } from './auth.constants';
 import { CreateUserDto } from '@/users/dto/create-user.dto';
 import { DRIZZLE } from '@/drizzle/drizzle.module';
 import { DrizzleDB } from '@/drizzle/types/drizzle';
@@ -39,11 +39,12 @@ export class AuthService {
 
   async refreshToken(user: any, refreshToken: string) {
     const userExist = await this.db.query.users.findFirst({
-      where: eq(users.id, user.id),
+      where: eq(users.id, user.userId),
     });
 
-    if (!userExist || !userExist.hashedRefreshToken)
+    if (!userExist || !userExist.hashedRefreshToken) {
       throw new UnauthorizedException();
+    }
 
     const isRTvalid = await bcrypt.compare(
       refreshToken,
@@ -53,8 +54,8 @@ export class AuthService {
     if (!isRTvalid) throw new ForbiddenException('Access Denied');
 
     const token = await this.getJWT({
-      email: userExist.email,
       sub: userExist.id,
+      email: userExist.email,
     });
 
     return { accessToken: token };
@@ -72,14 +73,23 @@ export class AuthService {
     return null;
   }
 
-  async generateUsername(email: string, generateNew: boolean = false) {
-    const initialUN = email.split('@')[0];
-    if (initialUN.length >= 7 || initialUN.length <= 14)
-      throw new Error('Username must be between 7 and 14 characters.');
+  // async generateUsername(email: string, generateNew: boolean = false) {
+  //   const initialUN = email.split('@')[0];
+  //   // console.log('initialUN', initialUN);
+  //   console.log(initialUN.length);
+  //   console.log(initialUN.length <= 7);
+  //   console.log(initialUN.length >= 14);
+  //   if (initialUN.length <= 7){
+  //     // add fillers at the end of string
+  //   }
 
-    // handle edge cases where length before @ is less than 7, Hint: add randon fillers at the end of string
-    return initialUN;
-  }
+  //   if(initialUN.length > 14){
+
+  //   }
+
+  //   // handle edge cases where length before @ is less than 7, Hint: add randon fillers at the end of string
+  //   return initialUN;
+  // }
 
   async checkUsernameExist(username: string) {
     const userWithUsernameExist =
@@ -88,29 +98,13 @@ export class AuthService {
     return false;
   }
 
-  async signUpUser(user: CreateUserDto) {
+  async signUpUser(user: CreateUserDto, res: any) {
     // check if same email exist in db
     const userExist = await this.usersService.findOneByEmail(user.email);
-    if (userExist.email === user.email)
-      throw new Error('Email already exists!');
+    if (userExist) throw new Error('Email already exists!');
 
-    if (user.username) {
-      const userWithUsernameExist = await this.checkUsernameExist(
-        user.username,
-      );
-      if (userWithUsernameExist) throw new Error('Username already exists!');
-    } else {
-      // remove everything after @ and make that username
-      user.username = await this.generateUsername(user.email); // splitting email by @ and assigning value before @ to username
-
-      // check if that username already exist, if it does generate
-      const userWithUsernameExist = await this.checkUsernameExist(
-        user.username,
-      );
-      if (userWithUsernameExist) {
-        user.username = await this.generateUsername(user.email, true);
-      }
-    }
+    const userWithUsernameExist = await this.checkUsernameExist(user.username);
+    if (userWithUsernameExist) throw new Error('Username already exists!');
 
     const hashedPassword = await bcrypt.hash(user.password, saltOrRounds);
 
@@ -118,29 +112,46 @@ export class AuthService {
       email: user.email,
       password: hashedPassword,
       username: user.username,
-    })[0]; // adding [0] cause create method return an array of inserted values
+    }); // adding [0] cause create method return an array of inserted values
 
-    const refreshToken = await this.jwtService.signAsync({
-      email: user.email,
-      sub: userCreated.id,
-    });
+    console.log('userCreated', userCreated);
+
+    const refreshToken = await this.jwtService.signAsync(
+      {
+        // sub: userCreated.id,
+      },
+      {
+        secret: process.env.JWT_REFRESH_TOKEN_SECRET,
+        expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_DAYS,
+      },
+    );
+
     const hashedRefreshToken = await bcrypt.hash(user.password, saltOrRounds);
+    // await this.updateRTHash(userCreated.id, hashedRefreshToken);
 
-    await this.updateRTHash(userCreated.id, hashedRefreshToken);
+    const accessToken = await this.getJWT({
+      // sub: userCreated.id,
+      // email: userCreated.email,
+    });
 
-    return { message: 'Success' };
+    res.cookie('refreshToken', refreshToken, HTTP_ONLY_REFRESH_TOKEN_COOKIE);
+
+    return { accessToken };
   }
 
-  async signInUser(user: any) {
+  async signInUser(user: any, refreshTokenPassed) {
     // TODO: replace email with username
-    const payload = { email: user.email, sub: user.id };
+    const payload = { sub: user.id, email: user.email };
     const accessToken = await this.getJWT(payload);
-    const refreshToken = await this.getJWT(
-      payload,
-      process.env.JWT_REFRESH_TOKEN_EXPIRES_DAYS,
-      process.env.JWT_REFRESH_TOKEN_SECRET,
-    );
-    await this.updateRTHash(user.id, refreshToken);
+    // const refreshToken = await this.getJWT(
+    //   { sub: user.id },
+    //   process.env.JWT_REFRESH_TOKEN_EXPIRES_DAYS,
+    //   process.env.JWT_REFRESH_TOKEN_SECRET,
+    // );
+
+    // console.log('RT sent to db in API ----', refreshToken);
+
+    await this.updateRTHash(user.id, refreshTokenPassed);
     return {
       accessToken: accessToken,
     };

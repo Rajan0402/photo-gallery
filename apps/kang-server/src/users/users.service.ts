@@ -17,7 +17,6 @@ export class UsersService {
         email: createUserDto.email,
         password: createUserDto.password,
         username: createUserDto.username,
-        hashedRefreshToken: createUserDto?.hashedRefreshToken,
       })
       .returning();
   }
@@ -48,7 +47,7 @@ export class UsersService {
   updateRTHash(userId: number, hashedRefreshToken: string) {
     return this.db
       .update(users)
-      .set({ hashedRefreshToken: hashedRefreshToken })
+      .set({ hashedRefreshToken })
       .where(eq(users.id, userId));
   }
 

@@ -1,0 +1,1 @@
+ALTER TABLE "photo_gallery_users" RENAME COLUMN "hashedRefreshToken" TO "hashed_refresh_token";
