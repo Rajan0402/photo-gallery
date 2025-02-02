@@ -6,9 +6,7 @@
   ],
   "scripts": {
     "dev": "turbo run dev",
-    "build": "turbo run build",
-    "db-generate": "cd ./apps/kang-server && npx drizzle-kit generate",
-    "db-migrate": "cd ./apps/kang-server && npx drizzle-kit migrate"
+    "build": "turbo run build"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
