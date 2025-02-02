@@ -1,14 +1,15 @@
 import "./App.css";
-import UploadButton from "./components/upload-button/index";
+import { BrowserRouter } from "react-router-dom";
+import AllRoutes from "./AllRoutes";
+import { AuthProvider } from "@/providers/AuthProvider/AuthProvider";
 
 function App() {
   return (
-    <>
-      <div>Hello</div>
-      <div className="top-nav">
-        <UploadButton />
-      </div>
-    </>
+    <AuthProvider>
+      <BrowserRouter>
+        <AllRoutes />
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
