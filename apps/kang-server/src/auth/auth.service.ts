@@ -1,6 +1,5 @@
 import {
   ForbiddenException,
-  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -8,18 +7,15 @@ import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { HTTP_ONLY_REFRESH_TOKEN_COOKIE, saltOrRounds } from './auth.constants';
-import { CreateUserDto } from '@/users/dto/create-user.dto';
-import { DRIZZLE } from '@/drizzle/drizzle.module';
-import { DrizzleDB } from '@/drizzle/types/drizzle';
-import { eq } from 'drizzle-orm';
-import { users } from '@/drizzle/schema';
+import { PrismaService } from '@/prisma/prisma.service';
+import { User, Prisma } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    @Inject(DRIZZLE) private db: DrizzleDB,
+    private prisma: PrismaService,
   ) {}
 
   async getJWT(payload, expiresIn = null, secret = null) {
@@ -31,24 +27,31 @@ export class AuthService {
     return token;
   }
 
-  async updateRTHash(userId, refreshToken) {
+  async updateRTHash(userId: number, refreshToken: string) {
     const hashedRefreshToken = await bcrypt.hash(refreshToken, saltOrRounds);
 
-    await this.usersService.updateRTHash(userId, hashedRefreshToken);
+    const updateRtHashInDB = {
+      where: { id: userId },
+      data: { hashed_refresh_token: hashedRefreshToken },
+    };
+
+    await this.usersService.update(updateRtHashInDB);
   }
 
   async refreshToken(user: any, refreshToken: string) {
-    const userExist = await this.db.query.users.findFirst({
-      where: eq(users.id, user.userId),
+    const userExist = await this.prisma.user.findFirst({
+      where: {
+        id: user.userId,
+      },
     });
 
-    if (!userExist || !userExist.hashedRefreshToken) {
+    if (!userExist || !userExist.hashed_refresh_token) {
       throw new UnauthorizedException();
     }
 
     const isRTvalid = await bcrypt.compare(
       refreshToken,
-      userExist.hashedRefreshToken,
+      userExist.hashed_refresh_token,
     );
 
     if (!isRTvalid) throw new ForbiddenException('Access Denied');
@@ -98,7 +101,7 @@ export class AuthService {
     return false;
   }
 
-  async signUpUser(user: CreateUserDto, res: any) {
+  async signUpUser(user: Prisma.UserCreateInput, res: any) {
     // check if same email exist in db
     const userExist = await this.usersService.findOneByEmail(user.email);
     if (userExist) throw new Error('Email already exists!');
@@ -112,13 +115,11 @@ export class AuthService {
       email: user.email,
       password: hashedPassword,
       username: user.username,
-    }); // adding [0] cause create method return an array of inserted values
-
-    console.log('userCreated', userCreated);
+    });
 
     const refreshToken = await this.jwtService.signAsync(
       {
-        // sub: userCreated.id,
+        sub: userCreated.id,
       },
       {
         secret: process.env.JWT_REFRESH_TOKEN_SECRET,
@@ -127,20 +128,19 @@ export class AuthService {
     );
 
     const hashedRefreshToken = await bcrypt.hash(user.password, saltOrRounds);
-    // await this.updateRTHash(userCreated.id, hashedRefreshToken);
+    await this.updateRTHash(userCreated.id, hashedRefreshToken);
 
     const accessToken = await this.getJWT({
-      // sub: userCreated.id,
-      // email: userCreated.email,
+      sub: userCreated.id,
+      email: user.email,
     });
-
     res.cookie('refreshToken', refreshToken, HTTP_ONLY_REFRESH_TOKEN_COOKIE);
+    return res.json({ accessToken: accessToken });
 
-    return { accessToken };
+    // return { accessToken: accessToken };
   }
 
   async signInUser(user: any, refreshTokenPassed) {
-    // TODO: replace email with username
     const payload = { sub: user.id, email: user.email };
     const accessToken = await this.getJWT(payload);
     // const refreshToken = await this.getJWT(

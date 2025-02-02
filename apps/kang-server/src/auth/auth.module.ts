@@ -7,15 +7,20 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RefreshJwtStrategy } from './strategies/refreshJwt.strategy';
-import { DrizzleModule } from '@/drizzle/drizzle.module';
+import { PrismaService } from '@/prisma/prisma.service';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, RefreshJwtStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    RefreshJwtStrategy,
+    PrismaService,
+  ],
   imports: [
     UsersModule,
     PassportModule,
-    DrizzleModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: {

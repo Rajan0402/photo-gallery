@@ -1,29 +1,23 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { DRIZZLE } from 'src/drizzle/drizzle.module';
-import { DrizzleDB } from 'src/drizzle/types/drizzle';
-import { users } from 'src/drizzle/schema';
-import { eq } from 'drizzle-orm';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '@/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject(DRIZZLE) private db: DrizzleDB) {}
+  constructor(private prisma: PrismaService) {}
 
-  create(createUserDto: CreateUserDto) {
-    return this.db
-      .insert(users)
-      .values({
-        email: createUserDto.email,
-        password: createUserDto.password,
-        username: createUserDto.username,
-      })
-      .returning();
+  create(
+    signUpUserInput: Prisma.UserCreateInput,
+    userSelect?: Prisma.UserSelect,
+  ) {
+    return this.prisma.user.create({
+      data: signUpUserInput,
+      select: userSelect,
+    });
   }
 
   findAll() {
-    // return await this.db.select().from(users);
-    return this.db.query.users.findMany();
+    return this.prisma.user.findMany();
   }
 
   findOne(id: number) {
@@ -31,26 +25,27 @@ export class UsersService {
   }
 
   findOneByEmail(email: string) {
-    return this.db.query.users.findFirst({ where: eq(users.email, email) });
-  }
-
-  findOneByUsername(username: string) {
-    return this.db.query.users.findFirst({
-      where: eq(users.username, username),
+    return this.prisma.user.findFirst({
+      where: { email },
     });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  findOneByUsername(username: string) {
+    return this.prisma.user.findFirst({
+      where: { username },
+    });
+  }
+
+  update(userUpdateArgs: Prisma.UserUpdateArgs) {
+    return this.prisma.user.update(userUpdateArgs);
   }
 
   updateRTHash(userId: number, hashedRefreshToken: string) {
-    return this.db
-      .update(users)
-      .set({ hashedRefreshToken })
-      .where(eq(users.id, userId));
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { hashed_refresh_token: hashedRefreshToken },
+    });
   }
-
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
