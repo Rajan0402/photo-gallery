@@ -8,8 +8,9 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CurrentUser } from '@/auth/decorators/currentUserDecorator';
+import { User } from '@prisma/client';
 
 @Controller('users')
 export class UsersController {
@@ -32,8 +33,16 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  update(@CurrentUser() user: User, @Body() updateUserInput: UpdateUserDto) {
+    const prismaUpdateUserInput = {
+      where: {
+        id: user.id,
+      },
+      data: {
+        updateUserInput,
+      },
+    };
+    return this.usersService.update(prismaUpdateUserInput);
   }
 
   @Delete(':id')
