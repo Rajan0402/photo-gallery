@@ -22,6 +22,8 @@ const useUploadThingInputProps = (...args: Input) => {
       formData.append("files", file);
     });
 
+    console.log("formData type-", formData);
+
     const result = await fetch(
       `${import.meta.env.VITE_BACKEND_URL}/api/files/upload`,
       {
@@ -42,8 +44,7 @@ const useUploadThingInputProps = (...args: Input) => {
   return {
     inputProps: {
       onChange,
-      // multiple: ($ut.permittedFileInfo?.config?.image?.maxFileCount ?? 1) > 1,
-      multiple: ($ut.routeConfig?.image?.maxFileCount ?? 1) > 1,
+      // multiple: ($ut.routeConfig?.image?.maxFileCount ?? 1) > 1,
       accept: "image/*",
     },
     isUploading: $ut.isUploading,
@@ -70,26 +71,32 @@ function UploadSVG() {
 }
 
 export default function UploadButton() {
-  const [, setUploadComplete] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   // const router = useRouter();
 
-  const { inputProps } = useUploadThingInputProps("imageUploader", {
-    onUploadBegin() {
-      window.alert("Upload started");
-    },
-    onUploadError(error) {
-      console.log(`Upload failed: ${error.message}`);
-    },
-    onClientUploadComplete() {
-      console.log("Upload complete");
-      setUploadComplete((prev) => !prev);
-      // router.refresh();
-    },
-  });
+  const { inputProps, isUploading } = useUploadThingInputProps(
+    "imageUploader",
+    {
+      onUploadBegin() {
+        window.alert("Upload started");
+      },
+      onUploadError(error) {
+        console.log(`Upload failed: ${error.message}`);
+      },
+      onClientUploadComplete() {
+        console.log("Upload complete");
+        // router.refresh();
+      },
+    }
+  );
 
   return (
     <div>
-      <label htmlFor="upload-button" className="cursor-pointer">
+      <label
+        htmlFor="upload-button"
+        className="upload-button"
+        aria-disabled={isUploading}
+      >
         <UploadSVG />
       </label>
       <input
