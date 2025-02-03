@@ -67,32 +67,15 @@ export class AuthService {
   async validateUser(email: string, password: string) {
     const user = await this.usersService.findOneByEmail(email);
     if (!user) return null;
-    // TODO: password must be hashed
-    const passwordMatch = user.password === password ? true : false;
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
     if (passwordMatch) {
       const { password, ...result } = user;
       return result;
     }
+
     return null;
   }
-
-  // async generateUsername(email: string, generateNew: boolean = false) {
-  //   const initialUN = email.split('@')[0];
-  //   // console.log('initialUN', initialUN);
-  //   console.log(initialUN.length);
-  //   console.log(initialUN.length <= 7);
-  //   console.log(initialUN.length >= 14);
-  //   if (initialUN.length <= 7){
-  //     // add fillers at the end of string
-  //   }
-
-  //   if(initialUN.length > 14){
-
-  //   }
-
-  //   // handle edge cases where length before @ is less than 7, Hint: add randon fillers at the end of string
-  //   return initialUN;
-  // }
 
   async checkUsernameExist(username: string) {
     const userWithUsernameExist =
@@ -140,7 +123,7 @@ export class AuthService {
     // return { accessToken: accessToken };
   }
 
-  async signInUser(user: any, refreshTokenPassed) {
+  async signInUser(user: any, refreshToken) {
     const payload = { sub: user.id, email: user.email };
     const accessToken = await this.getJWT(payload);
     // const refreshToken = await this.getJWT(
@@ -151,9 +134,9 @@ export class AuthService {
 
     // console.log('RT sent to db in API ----', refreshToken);
 
-    await this.updateRTHash(user.id, refreshTokenPassed);
+    await this.updateRTHash(user.id, refreshToken);
     return {
-      accessToken: accessToken,
+      accessToken,
     };
   }
 
