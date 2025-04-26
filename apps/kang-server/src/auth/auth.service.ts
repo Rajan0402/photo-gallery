@@ -28,6 +28,8 @@ export class AuthService {
   }
 
   async updateRTHash(userId: number, refreshToken: string) {
+    console.log('data', refreshToken);
+    console.log('data', saltOrRounds);
     const hashedRefreshToken = await bcrypt.hash(refreshToken, saltOrRounds);
 
     const updateRtHashInDB = {
@@ -35,7 +37,7 @@ export class AuthService {
       data: { hashed_refresh_token: hashedRefreshToken },
     };
 
-    await this.usersService.update(updateRtHashInDB);
+    return await this.usersService.update(updateRtHashInDB);
   }
 
   async refreshToken(user: any, refreshToken: string) {
@@ -87,10 +89,12 @@ export class AuthService {
   async signUpUser(user: Prisma.UserCreateInput, res: any) {
     // check if same email exist in db
     const userExist = await this.usersService.findOneByEmail(user.email);
-    if (userExist) throw new Error('Email already exists!');
+    if (userExist)
+      return res.status(409).json({ message: 'Email already exists!' });
 
     const userWithUsernameExist = await this.checkUsernameExist(user.username);
-    if (userWithUsernameExist) throw new Error('Username already exists!');
+    if (userWithUsernameExist)
+      return res.status(409).json({ message: 'Username already exists!' });
 
     const hashedPassword = await bcrypt.hash(user.password, saltOrRounds);
 
@@ -123,7 +127,7 @@ export class AuthService {
     // return { accessToken: accessToken };
   }
 
-  async signInUser(user: any, refreshToken) {
+  async signInUser(user: any, refreshToken: string) {
     const payload = { sub: user.id, email: user.email };
     const accessToken = await this.getJWT(payload);
     // const refreshToken = await this.getJWT(
@@ -134,7 +138,7 @@ export class AuthService {
 
     // console.log('RT sent to db in API ----', refreshToken);
 
-    await this.updateRTHash(user.id, refreshToken);
+    // await this.updateRTHash(user.id, refreshToken);
     return {
       accessToken,
     };

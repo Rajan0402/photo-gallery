@@ -19,13 +19,12 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('signInUser')
   signInUser(@Request() req) {
-    let refreshToken = req?.signedCookies?.refreshToken;
-
-    // in case testing api through postman, **add headers.origin as mentioned below in postman
-    if (!refreshToken && req?.headers?.origin === 'http://fromPostman.com') {
-      refreshToken = req?.headers?.authorization.split(' ')[1];
-    }
-    return this.authService.signInUser(req.user, refreshToken);
+    const refreshToken = req.res;
+    // console.log('refreshToken', refreshToken);
+    const user = req.user;
+    console.log('req.user', user);
+    // const result = this.authService.signInUser(user, refreshToken);
+    return this.authService.signInUser(user, refreshToken);
   }
 
   // TODO: update this User type to come from a types folder instead of prisma
@@ -47,9 +46,9 @@ export class AuthController {
     let refreshToken = req?.signedCookies?.refreshToken;
 
     // in case testing api through postman, **add headers.origin as mentioned below in postman
-    if (!refreshToken && req?.headers?.origin === 'http://fromPostman.com') {
-      refreshToken = req?.headers?.authorization.split(' ')[1];
-    }
+    // if (!refreshToken && req?.headers?.origin === 'http://fromPostman.com') {
+    //   refreshToken = req?.headers?.authorization.split(' ')[1];
+    // }
     return this.authService.refreshToken(req.user, refreshToken);
   }
 }

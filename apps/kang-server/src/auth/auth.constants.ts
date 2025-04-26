@@ -17,8 +17,9 @@ export const HTTP_ONLY_COOKIE = {
 export const HTTP_ONLY_REFRESH_TOKEN_COOKIE = {
   maxAge: Number(jwtExpiresMilliSecondForRefreshToken), // cookie lives same amount of time as jwt
   httpOnly: true,
-  sameSite: true,
+  // sameSite: true,
   signed: true,
   expires: false,
+  secure: process.env.NODE_ENV === 'production',
   // domain,
 };

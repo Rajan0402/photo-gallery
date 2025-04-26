@@ -9,10 +9,14 @@ import {
   HTTP_ONLY_COOKIE,
   HTTP_ONLY_REFRESH_TOKEN_COOKIE,
 } from '../auth.constants';
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class LocalAuthGuard extends AuthGuard('local') {
-  constructor(private jwtService: JwtService) {
+  constructor(
+    private jwtService: JwtService,
+    private authService: AuthService,
+  ) {
     super();
   }
 
@@ -40,7 +44,7 @@ export class LocalAuthGuard extends AuthGuard('local') {
         expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_DAYS,
       },
     );
-    console.log('RT set in cookie thru guard ----', refreshToken);
+    // console.log('RT set in cookie thru guard ----', refreshToken);
 
     const request = this.getRequest(context);
     request.res?.cookie('accessToken', accessToken, HTTP_ONLY_COOKIE);
@@ -49,6 +53,9 @@ export class LocalAuthGuard extends AuthGuard('local') {
       refreshToken,
       HTTP_ONLY_REFRESH_TOKEN_COOKIE,
     );
+    this.authService.updateRTHash(user.id, refreshToken);
+
+    // console.log('in local guard', request.res);
 
     return user;
   }
