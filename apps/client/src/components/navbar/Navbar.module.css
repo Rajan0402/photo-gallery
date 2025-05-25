@@ -1,0 +1,30 @@
+.navbar {
+  height: var(--narbar-height);
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--primary-color);
+  color: var(--light-text-color);
+  position: sticky;
+}
+.logo__img {
+  width: 30px;
+}
+.tab_btns_container {
+  /* width: 100%; */
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+}
+
+.search_overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--narbar-height);
+  background-color: var(--primary-color);
+  z-index: 999;
+  padding: 0.5rem 1rem;
+}
