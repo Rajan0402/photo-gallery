@@ -1,0 +1,4 @@
+.main_container {
+  height: calc(100vh - var(--narbar-height));
+  background-color: var(--secondary-color);
+}
