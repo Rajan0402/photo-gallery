@@ -1,12 +1,14 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import styles from "./SearchBar.module.css";
 import { IoArrowBack, IoSearchSharp } from "react-icons/io5";
 
 const SearchBar = ({ onBack }: { onBack?: () => void }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [searchInputFocus, setSearchInputFocus] = useState(false);
 
   const focusOnInput = () => {
     inputRef.current?.focus();
+    setSearchInputFocus(true);
   };
 
   return (
@@ -35,9 +37,15 @@ const SearchBar = ({ onBack }: { onBack?: () => void }) => {
             type="search"
             id="search"
             placeholder="Search Files"
+            onFocus={() => setSearchInputFocus(true)}
+            onBlur={() => setSearchInputFocus(false)}
           />
         </div>
       </div>
+      <div
+        className={styles.search_content_suggestion_container}
+        style={{ visibility: searchInputFocus ? "visible" : "hidden" }}
+      ></div>
     </>
   );
 };

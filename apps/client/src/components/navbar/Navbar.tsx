@@ -42,7 +42,9 @@ const Navbar = () => {
       />
       <div className={styles.tab_btns_container}>
         {isWide ? (
-          <SearchBar />
+          <div className={styles.search_bar_box}>
+            <SearchBar />
+          </div>
         ) : (
           <SearchIcon onClick={handleSearchIconClick} />
         )}

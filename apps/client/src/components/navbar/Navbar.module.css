@@ -1,9 +1,9 @@
 .navbar {
-  height: var(--narbar-height);
+  height: var(--navbar-height);
   padding: 0 1.25rem;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  /* justify-content: space-between; */
+  gap: 60px;
   background-color: var(--primary-color);
   color: var(--light-text-color);
   position: sticky;
@@ -12,10 +12,11 @@
   width: 30px;
 }
 .tab_btns_container {
-  /* width: 100%; */
+  width: 100%;
   align-items: center;
   display: flex;
   gap: 1rem;
+  justify-content: flex-end;
 }
 
 .search_overlay {
@@ -23,8 +24,14 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: var(--narbar-height);
+  height: var(--navbar-height);
   background-color: var(--primary-color);
   z-index: 999;
   padding: 0.5rem 1rem;
+}
+
+@media (width > 480px) {
+  .search_bar_box {
+    margin-right: auto;
+  }
 }

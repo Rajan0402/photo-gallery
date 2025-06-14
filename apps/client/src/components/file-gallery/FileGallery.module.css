@@ -1,4 +1,4 @@
 .main_container {
-  height: calc(100vh - var(--narbar-height));
+  height: calc(100vh - var(--navbar-height));
   background-color: var(--secondary-color);
 }

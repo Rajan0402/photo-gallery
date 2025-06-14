@@ -3,7 +3,9 @@ import { FiUpload } from "react-icons/fi";
 const UploadBtn = () => {
   return (
     <>
-      <FiUpload title="upload" size={"1.5rem"} />
+      <button>
+        <FiUpload title="upload" size={"1.5rem"} />
+      </button>
     </>
   );
 };
