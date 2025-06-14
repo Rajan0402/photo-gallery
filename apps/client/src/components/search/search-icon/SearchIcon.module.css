@@ -1,0 +1,10 @@
+.search_icon__btn {
+  /* height: 40px; */
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  align-items: center;
+}
+.search_icon__btn .search_icon {
+  color: rgba(255, 255, 255, 0.8);
+}
