@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UTApi } from 'uploadthing/server';
 import { UploadFileResult } from 'uploadthing/types';
+import { createUploadthing, type FileRouter } from 'uploadthing/express';
 
 interface FileEsque extends Blob {
   name: string;
@@ -11,9 +12,26 @@ export interface deleteFileRespose {
   deletedCount: number;
 }
 
+const f = createUploadthing();
+
+export const fileRouter = {
+  imageUploader: f({ image: { maxFileSize: '4MB', maxFileCount: 10 } })
+    .middleware(async ({ req, input }) => {
+      console.log('first');
+      return {};
+    })
+    .onUploadComplete((data) => {
+      console.log('Upload complete:', data);
+    }),
+} satisfies FileRouter;
+
 @Injectable()
 export class UploadThingService {
   constructor(private readonly utapi: UTApi) {}
+
+  fileRouter() {
+    return fileRouter;
+  }
 
   async utUploadFile(
     files: Express.Multer.File[],
