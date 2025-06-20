@@ -1,35 +1,43 @@
-//***************************************************************************************************************** */
-//******** Removing this file to make this module not available via API and making it only for internal use ********//
-//***************************************************************************************************************** */
+import {
+  All,
+  Controller,
+  Req,
+  Res,
+  Next,
+  Inject,
+  UseInterceptors,
+  UploadedFile,
+  Post,
+} from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+import { createRouteHandler } from 'uploadthing/express';
+import { UploadThingService } from './upload-thing.service';
+import { UTApi } from 'uploadthing/server';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
-// import {
-//   Controller,
-//   Post,
-//   UseInterceptors,
-//   UploadedFiles,
-//   Delete,
-// } from '@nestjs/common';
-// import { FilesInterceptor } from '@nestjs/platform-express';
-// import { UploadThingService } from './upload-thing.service';
+@Controller('uploadthing')
+export class UploadThingHandlerController {
+  private handler: ReturnType<typeof createRouteHandler>;
 
-// @Controller('ut')
-// export class UploadThingController {
-//   constructor(private readonly uploadThingService: UploadThingService) {}
+  constructor(
+    @Inject(UTApi) private readonly utapi: UTApi,
+    private readonly uploadThingService: UploadThingService,
+  ) {
+    this.handler = createRouteHandler({
+      router: this.uploadThingService.fileRouter(),
+    });
+  }
 
-//   @Post('uploadFiles')
-//   @UseInterceptors(FilesInterceptor('files'))
-//   async uploadFile(@UploadedFiles() files: Express.Multer.File[]) {
-//     console.log('Received files:', files); // Inspect the files
-//     return this.uploadThingService.utUploadFile(files);
-//   }
-
-//   @Post('uploadFilesFromURL')
-//   async uploadFilesFromURL(files: string[]) {
-//     return this.uploadThingService.utUploadFilesFromURL(files);
-//   }
-
-//   @Delete('deleteFiles')
-//   async deleteFiles(files: string[]) {
-//     return this.uploadThingService.utDeleteFiles(files);
-//   }
-// }
+  @Post('*')
+  @UseInterceptors(FilesInterceptor('files'))
+  handle(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Next() next: NextFunction,
+    @UploadedFile() files: Express.Multer.File[],
+  ) {
+    // console.log(req.files);
+    // req.body = { files: req.files };
+    return this.handler;
+  }
+}

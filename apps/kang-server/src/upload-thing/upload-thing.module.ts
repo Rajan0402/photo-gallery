@@ -4,9 +4,10 @@ import { Module } from '@nestjs/common';
 import { UploadThingService } from './upload-thing.service';
 import { UTApi } from 'uploadthing/server';
 import { ConfigService } from '@nestjs/config';
+import { UploadThingHandlerController } from './upload-thing.controller';
 
 @Module({
-  // controllers: [UploadThingController], //controller removed
+  controllers: [UploadThingHandlerController], //controller removed
   providers: [
     UploadThingService,
     {
