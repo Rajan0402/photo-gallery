@@ -9,7 +9,7 @@ import {
   MaxFileSizeValidator,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { UploadFilesService } from './upload-files.service';
+import { UploadFilesService } from './files.service';
 
 @Controller('files')
 export class UploadFilesController {

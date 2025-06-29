@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { UploadFilesController } from './upload-files.controller';
-import { UploadFilesService } from './upload-files.service';
+import { UploadFilesController } from './files.controller';
+import { UploadFilesService } from './files.service';
 import { UploadThingModule } from 'src/upload-thing/upload-thing.module';
 import { EncryptionService } from '@/encryption/encryption.service';
 
