@@ -4,4 +4,4 @@
 
 ## TODO
 
-[ ] - remove Drizzle and integrate Prisma
+[ ] - implement authorization
