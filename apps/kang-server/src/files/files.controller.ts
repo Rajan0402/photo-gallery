@@ -5,9 +5,11 @@ import {
   UploadedFiles,
   Delete,
   Body,
+  ParseFilePipe,
+  MaxFileSizeValidator,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { UploadFilesService } from './upload-files.service';
+import { UploadFilesService } from './files.service';
 
 @Controller('files')
 export class UploadFilesController {
@@ -15,7 +17,16 @@ export class UploadFilesController {
 
   @Post('upload')
   @UseInterceptors(FilesInterceptor('files'))
-  async uploadFile(@UploadedFiles() files: Express.Multer.File[]) {
+  async uploadFile(
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [
+          // new MaxFileSizeValidator({maxSize: 5000}),
+        ],
+      }),
+    )
+    files: Express.Multer.File[],
+  ) {
     return await this.uploadFilesService.uploadFiles(files);
   }
 
