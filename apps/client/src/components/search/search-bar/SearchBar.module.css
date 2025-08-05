@@ -18,6 +18,7 @@
   cursor: pointer;
 }
 .search_icon {
+  margin: auto;
   color: rgba(255, 255, 255, 0.5);
 }
 
